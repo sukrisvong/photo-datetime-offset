@@ -1,5 +1,7 @@
-from exif import Image as ExifImage
+
 import os
+from tqdm import tqdm
+from exif import Image
 from datetime import datetime
 
 def run():
@@ -14,11 +16,11 @@ def run():
     offset = None
 
     # Modify photo metadata
-    for image_path in image_paths:
+    for image_path in tqdm(image_paths, desc="Updating Timestamps"):
         try:
             # Open photo
             with open(image_path, "rb") as image_file:
-                image = ExifImage(image_file)
+                image = Image(image_file)
 
             # Read in the EXIF data from the image
             camp_snap_timestamp = image.datetime_original
@@ -36,7 +38,6 @@ def run():
             image.datetime_original = actual_timestamp
             with open(image_path, "wb") as image_file:
                 image_file.write(image.get_file())
-            print(f"Modifed datetime from {camp_snap_timestamp} to {actual_timestamp}")
         except Exception as error:
             print(f"FAILED TO MODIFY TIMESTAMP FOR {image_path}: {error}")
 
